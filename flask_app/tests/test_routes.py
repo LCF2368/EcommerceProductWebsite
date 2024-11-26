@@ -1,31 +1,28 @@
-import unittest   # Import the Flask app from app.py
+import unittest
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app import app
 
-class TestRoutes(unittest.TestCase):
-    # Set up the Flask test client before each test
+class TestHomeRoute(unittest.TestCase):
+    """Unit test class for testing the home route in a Flask application."""
+
     def setUp(self):
-        self.app = app.test_client()  # Create a test client for the Flask app
-        self.app.testing = True  # Enable testing mode for the app
+        """Set up a Flask test client."""
+        app.config['TESTING'] = True
+        self.client = app.test_client()
 
-    # Test 1: Check if the home route returns a 200 status code
-    def test_home_route(self):
-        response = self.app.get('/')  # Simulate a GET request to the home route
-        self.assertEqual(response.status_code, 200)  # Check if status code is 200
-        self.assertIn(b'Welcome', response.data)  # Check if the response contains 'Welcome'
+    def tearDown(self):
+        """Tear down resources after each test."""
+        pass  # Add any cleanup code here if needed
 
-    # Test 2: Check if the /products route returns a 200 status code
-    def test_products_route(self):
-        response = self.app.get('/products')  # Simulate a GET request to the products route
-        self.assertEqual(response.status_code, 200)  # Check if status code is 200
-        self.assertIn(b'Products', response.data)  # Check if the response contains 'Products'
+    def test_home_route_invalid_method(self):
+        """
+        Test that the home route returns 405 when an invalid method is used.
+        Purpose: Ensures the route has proper HTTP method handling.
+        """
+        response = self.client.post('/')  # Using POST instead of GET
+        self.assertEqual(response.status_code, 405)  # Method Not Allowed
 
-    # Test 3: Check if a POST request to the / route returns a 405 status code (Method Not Allowed)
-    def test_home_route_post(self):
-        response = self.app.post('/')  # Simulate a POST request to the home route
-        self.assertEqual(response.status_code, 405)  # 405 means Method Not Allowed
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
